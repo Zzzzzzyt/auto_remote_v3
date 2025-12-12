@@ -316,10 +316,15 @@ bool decode() {
 
   uint32_t time = makeTime(tm);
   if (time < EPOCH_2025 || time >= EPOCH_2035) {
+    Serial.println("year out of range!!");
     return false;
   }
-  if (time_set && abs((int32_t)(time + 19 - betterNow())) > MAX_DIFF) {
-    return false;
+  if (time_set) {
+    uint32_t diff = time + 19 - betterNow();
+    if (abs((int32_t)diff) > MAX_DIFF) {
+      Serial.println("time diff out of range!!");
+      return false;
+    }
   }
   rtc_ms = t0;
   rtc_s = time + 1;
@@ -546,6 +551,7 @@ void loop() {
         u8g2.drawPixel(33, 10);
         u8g2.updateDisplayArea(0, 0, 6, 2);
       } else {
+        Serial.println("failed!!");
         t_trigger = t0;
         state = STATE_WAIT;
         displayState("wait..");
